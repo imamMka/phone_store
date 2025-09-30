@@ -1,7 +1,10 @@
 import express from 'express';
-import { getAllUsersHandler, getUsersByIdHandler } from '../handler/userHandler.js';
+import { getAllUsersHandler, getUsersByIdHandler, addUsersHandler } from '../handler/userHandler.js';
 
 const userRouter = express.Router();
 
-userRouter.get('/', getAllUsersHandler);
-userRouter.get('/:id', getUsersByIdHandler);
+userRouter.get('/users', getAllUsersHandler);
+userRouter.get('/users/:id', getUsersByIdHandler);
+userRouter.post('/users', addUsersHandler);
+
+export default userRouter;
