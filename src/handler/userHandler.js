@@ -2,7 +2,9 @@ import { pool } from "../config/db.js";
 
 export const getAllUsersHandler = async (req, res) => {
   try {
-    const [users] = await pool.query("SELECT id, fullname, username, email, role FROM users");
+    const [users] = await pool.query(
+      "SELECT id, fullname, username, email, role FROM users"
+    );
 
     res.status(200).json({
       status: "success",
@@ -18,7 +20,10 @@ export const getAllUsersHandler = async (req, res) => {
 export const getUsersByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const [users] = await pool.query("SELECT id, fullname, username, email, role FROM users WHERE id = ? ", [id]);
+    const [users] = await pool.query(
+      "SELECT id, fullname, username, email, role FROM users WHERE id = ? ",
+      [id]
+    );
 
     if (users.length === 0) {
       res.status(404).json({
@@ -41,13 +46,15 @@ export const getUsersByIdHandler = async (req, res) => {
 export const addUsersHandler = async (req, res) => {
   const { fullname, username, email, password, role } = req.body;
 
-  const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+  const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [
+    email,
+  ]);
 
   if (!fullname || !fullname.trim()) {
     return res.status(400).json({
       status: "fail",
       message: "fullname is required",
-    });  
+    });
   }
 
   if (!username || !username.trim()) {
@@ -86,12 +93,12 @@ export const addUsersHandler = async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query(
+    await pool.query(
       "INSERT INTO users (fullname, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
       [fullname, username, email, password, role]
     );
 
-    const newUser ={
+    const newUser = {
       id: result.insertId,
       fullname,
       username,
@@ -108,3 +115,80 @@ export const addUsersHandler = async (req, res) => {
     console.log(error);
   }
 };
+
+export const updateUsersHandler = async (req, res) => {
+  const { id } = req.params;
+  const {
+    fullname,
+    username,
+    email,
+    password,
+    role,
+    address,
+    phone_number,
+    age,
+  } = req.body;
+  try {
+    const [result] = await pool.query(
+      "UPDATE users SET fullname=?, username=?, email=?, password=?, role=?, address=?, phone_number=?, age=? WHERE id = ?",
+      [
+        fullname,
+        username,
+        email,
+        password,
+        role,
+        address,
+        phone_number,
+        age,
+        id
+      ]
+    );
+    const [userUpdate] = await pool.query("SELECT id, fullname, username, email, role, address, phone_number, age FROM users WHERE id = ? ",
+      [id])
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not Found",
+      });
+    }
+
+    
+
+    res.status(200).json({
+      status: "success",
+      message: "User updated succesfully",
+      data: userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "fail",
+      message: "Server Error",
+    });
+  }
+};
+
+
+export const deleteUsersHandler = async (req, res) => {
+  const {id} = req.params;
+
+  try {
+    const [ deleteUser ] = await pool.query("DELETE FROM users WHERE id = ?")
+
+    if(deleteUser.affectedRows === 0) {
+      res.status(404) ({
+        status: "fail",
+        message: "Note not found"
+      })
+    }
+    res.status(200).json ({ 
+      status: "success",
+      message: "User delete successfully",
+    })
+  } catch (error) {
+    console.error(error)
+
+  }
+}
