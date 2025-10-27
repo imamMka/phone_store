@@ -1,17 +1,20 @@
-import mysql from "mysql2/promise";
+import mysql from 'mysql2/promise';
 
 export const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "phone_store_db",
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'phone_store_db',
+  port: 3307,
 });
 
- export const testConnection = async () => {
+export const testConnection = async () => {
   try {
     const connection = await pool.getConnection();
-    console.log('Database connected succesfully')
+    console.log('Database connected successfully');
+    connection.release();
   } catch (error) {
-    console.log("Database connection failed:", error);
+    console.error('Error connecting to the database:', error);
+    throw error;
   }
 };
