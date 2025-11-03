@@ -33,14 +33,10 @@ export const addUsersHandler = async (req, res, next) => {
         const result = await UserService.addUsers(req.body);
         res.status(201).json({
             status: "success",
+            message: "User added successfully",
             data: result,
         })
 
-        res.status(201).json({
-            status: "success",
-            data: newUser,
-            message: "User created successfully",
-        })
     } catch (error) {
         next(error)
     }
